@@ -1,10 +1,11 @@
 import { QuestionForm } from "@/components/QuestionForm";
 import { QuestionList } from "@/components/QuestionList";
 import Image from "next/image";
+import { MarketingFooter } from "@/components/MarketingFooter";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-bone/30 pb-20">
+    <main className="min-h-screen bg-bone/30">
       <nav className="sticky top-0 bg-bone/80 backdrop-blur-sm border-b border-onyx/10 px-4 py-3 z-10 flex justify-between items-center">
         {/* Left side: RevFactor logo */}
         <div className="bg-[#DDDAD3 ] rounded-lg px-3 py-1 flex items-center">
@@ -61,6 +62,7 @@ export default function Home() {
           <QuestionList />
         </div>
       </div>
+      <MarketingFooter />
     </main>
   );
 }

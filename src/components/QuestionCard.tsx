@@ -115,9 +115,6 @@ export function QuestionCard({ question }: QuestionCardProps) {
             {question.answer && (
                 <div className="mt-6 pt-4 border-t border-onyx/5 bg-gray-50/50 -mx-5 px-5 pb-5 rounded-b-2xl">
                     <div className="space-y-3">
-                        <div className="flex items-center gap-2">
-                            <span className="font-serif font-bold text-cedar">Admin Response</span>
-                        </div>
 
                         {question.answer.videoUrl && (
                             <div className="relative w-full text-center my-3 bg-black rounded-lg overflow-hidden"

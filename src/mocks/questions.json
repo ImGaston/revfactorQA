@@ -1,0 +1,32 @@
+[
+    {
+        "id": "q1",
+        "text": "What is the best strategy for handling OTA cancellations in Q4?",
+        "authorName": "Sofia",
+        "status": "pending",
+        "voteCount": 5,
+        "createdAt": {
+            "seconds": 1709420000,
+            "nanoseconds": 0
+        }
+    },
+    {
+        "id": "q2",
+        "text": "How much should I rely on dynamic pricing tools vs manual adjustments?",
+        "authorName": "Carlos",
+        "status": "answered_live",
+        "voteCount": 12,
+        "createdAt": {
+            "seconds": 1709410000,
+            "nanoseconds": 0
+        },
+        "answer": {
+            "questionId": "q2",
+            "answerText": "We discussed this in the morning session. The key is to trust the tool for base rates but intervene for special events.",
+            "createdAt": {
+                "seconds": 1709430000,
+                "nanoseconds": 0
+            }
+        }
+    }
+]

@@ -17,6 +17,9 @@ export function QuestionCard({ question }: QuestionCardProps) {
     const [hasVoted, setHasVoted] = useState(false);
     const [isVoting, setIsVoting] = useState(false);
     const [optimisticVoteCount, setOptimisticVoteCount] = useState(question.voteCount);
+    const [isExpanded, setIsExpanded] = useState(false);
+    const [isReverting, setIsReverting] = useState(false);
+    const [isAnimating, setIsAnimating] = useState(false);
 
     useEffect(() => {
         // Check if user has already voted for this question
@@ -29,33 +32,55 @@ export function QuestionCard({ question }: QuestionCardProps) {
         }
     }, [question.id]);
 
-    const handleVote = async () => {
+    const handleVote = () => {
         if (hasVoted || isVoting) return;
+
+        // Optimistic UI updates
+        setHasVoted(true);
+        setOptimisticVoteCount(prev => prev + 1);
+
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 300);
+
+        // Optimistic localStorage update
+        const storedVotes = localStorage.getItem("rf_voted");
+        const votedIds = storedVotes ? JSON.parse(storedVotes) : [];
+        if (!votedIds.includes(question.id)) {
+            localStorage.setItem("rf_voted", JSON.stringify([...votedIds, question.id]));
+        }
 
         setIsVoting(true);
         const fingerprint = getOrCreateFingerprint();
 
-        try {
-            const result = await submitVote(question.id, fingerprint);
-
-            if (result.success || result.alreadyVoted) {
-                setHasVoted(true);
-                if (result.success) {
-                    setOptimisticVoteCount(prev => prev + 1);
+        // Background call (no await)
+        submitVote(question.id, fingerprint)
+            .then(result => {
+                if (!result.success || result.alreadyVoted) {
+                    revertVote();
                 }
+            })
+            .catch(error => {
+                console.error("Error voting:", error);
+                revertVote();
+            })
+            .finally(() => {
+                setIsVoting(false);
+            });
+    };
 
-                // Update local storage
-                const storedVotes = localStorage.getItem("rf_voted");
-                const votedIds = storedVotes ? JSON.parse(storedVotes) : [];
-                if (!votedIds.includes(question.id)) {
-                    localStorage.setItem("rf_voted", JSON.stringify([...votedIds, question.id]));
-                }
-            }
-        } catch (error) {
-            console.error("Error voting:", error);
-        } finally {
-            setIsVoting(false);
+    const revertVote = () => {
+        setHasVoted(false);
+        setOptimisticVoteCount(prev => prev - 1);
+
+        const currentStoredVotes = localStorage.getItem("rf_voted");
+        if (currentStoredVotes) {
+            const currentVotedIds = JSON.parse(currentStoredVotes);
+            const updatedVotedIds = currentVotedIds.filter((id: string) => id !== question.id);
+            localStorage.setItem("rf_voted", JSON.stringify(updatedVotedIds));
         }
+
+        setIsReverting(true);
+        setTimeout(() => setIsReverting(false), 2000);
     };
 
     const getEmbedUrl = (url: string) => {
@@ -95,21 +120,35 @@ export function QuestionCard({ question }: QuestionCardProps) {
                     </h3>
                 </div>
 
-                <Button
-                    onClick={handleVote}
-                    disabled={hasVoted || isVoting}
-                    variant="outline"
-                    size="sm"
-                    className={cn(
-                        "flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-[60px] border-secondary/20 transition-colors",
-                        hasVoted
-                            ? "bg-moss text-white border-moss hover:bg-moss opacity-100"
-                            : "hover:bg-bone hover:text-cedar text-onyx/60"
+                <div className="flex flex-col items-center relative">
+                    <Button
+                        onClick={handleVote}
+                        disabled={hasVoted || isVoting}
+                        variant="outline"
+                        size="sm"
+                        className={cn(
+                            "flex flex-col items-center gap-1 h-auto py-2 px-3 min-w-[60px] border-secondary/20 transition-all duration-300",
+                            hasVoted
+                                ? "bg-moss text-white border-moss hover:bg-moss opacity-100"
+                                : "hover:bg-bone hover:text-cedar text-onyx/60",
+                            isAnimating && "ring-2 ring-moss/30 rounded-full"
+                        )}
+                    >
+                        <ThumbsUp
+                            className={cn(
+                                "w-5 h-5 transition-all duration-300 ease-out",
+                                hasVoted ? "fill-current text-white" : "text-current",
+                                isAnimating ? "scale-125" : "scale-100"
+                            )}
+                        />
+                        <span className="text-xs font-bold">{optimisticVoteCount}</span>
+                    </Button>
+                    {isReverting && (
+                        <span className="absolute -bottom-6 text-[10px] font-medium text-red-500 whitespace-nowrap animate-in fade-in duration-200">
+                            Already voted
+                        </span>
                     )}
-                >
-                    <ThumbsUp className={cn("w-5 h-5", hasVoted && "fill-current")} />
-                    <span className="text-xs font-bold">{optimisticVoteCount}</span>
-                </Button>
+                </div>
             </div>
 
             {question.answer && (
@@ -136,9 +175,23 @@ export function QuestionCard({ question }: QuestionCardProps) {
                         )}
 
                         {question.answer.answerText && (
-                            <p className="text-onyx/80 text-sm whitespace-pre-wrap">
-                                {question.answer.answerText}
-                            </p>
+                            <div className="flex flex-col items-start gap-1">
+                                <p className="text-onyx/80 text-sm whitespace-pre-wrap transition-all duration-200">
+                                    {question.answer.answerText.length <= 280
+                                        ? question.answer.answerText
+                                        : isExpanded
+                                            ? question.answer.answerText
+                                            : `${question.answer.answerText.slice(0, 280)}...`}
+                                </p>
+                                {question.answer.answerText.length > 280 && (
+                                    <button
+                                        onClick={() => setIsExpanded(!isExpanded)}
+                                        className="text-xs font-sans font-medium text-moss underline-offset-2 hover:underline cursor-pointer bg-transparent border-none p-0 transition-all duration-200"
+                                    >
+                                        {isExpanded ? "Show less" : "Read more"}
+                                    </button>
+                                )}
+                            </div>
                         )}
                     </div>
                 </div>

@@ -49,7 +49,7 @@ export default function Home() {
 
         <QuestionForm />
 
-        <div className="mt-16">
+        <div className="mt-16 mb-24 md:mb-32">
           <div className="flex items-center justify-between mb-8">
             <h2 className="font-serif text-3xl text-cedar">
               Latest Questions

@@ -6,31 +6,33 @@ import { MarketingFooter } from "@/components/MarketingFooter";
 export default function Home() {
   return (
     <main className="min-h-screen bg-bone/30">
-      <nav className="sticky top-0 bg-bone/80 backdrop-blur-sm border-b border-onyx/10 px-4 py-3 z-10 flex justify-between items-center">
-        {/* Left side: RevFactor logo */}
-        <div className="bg-[#DDDAD3 ] rounded-lg px-3 py-1 flex items-center">
-          <Image
-            src="/RevFactor_logo.png"
-            alt="RevFactor Logo"
-            width={120}
-            height={32}
-            className="h-8 w-auto"
-            style={{ width: "auto" }}
-            priority
-          />
-        </div>
+      <nav className="sticky top-0 bg-bone/80 backdrop-blur-sm border-b border-onyx/10 z-10">
+        <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center w-full">
+          {/* Left side: RevFactor logo */}
+          <div className="bg-[#DDDAD3 ] rounded-lg px-3 py-1 flex items-center">
+            <Image
+              src="/RevFactor_logo.png"
+              alt="RevFactor Logo"
+              width={120}
+              height={32}
+              className="h-8 w-auto"
+              style={{ width: "auto" }}
+              priority
+            />
+          </div>
 
-        {/* Right side: Level Up Your Listing Summit logo */}
-        <div className="flex items-center">
-          <Image
-            src="/LUYL 2025 Logo.png"
-            alt="Level Up Your Listing Summit Logo"
-            width={100}
-            height={48}
-            className="h-12 w-auto"
-            style={{ width: "auto" }}
-            priority
-          />
+          {/* Right side: Level Up Your Listing Summit logo */}
+          <div className="flex items-center">
+            <Image
+              src="/LUYL 2025 Logo.png"
+              alt="Level Up Your Listing Summit Logo"
+              width={100}
+              height={48}
+              className="h-12 w-auto"
+              style={{ width: "auto" }}
+              priority
+            />
+          </div>
         </div>
       </nav>
 
@@ -39,7 +41,7 @@ export default function Home() {
       <div className="container max-w-4xl mx-auto px-4 pt-8 md:pt-16">
         <header className="text-center mb-12 space-y-4">
           <h1 className="font-serif text-5xl md:text-6xl font-bold text-cedar tracking-tight">
-            RevFactor Q&amp;A
+            LUYL Workshop Q&amp;A
           </h1>
           <p className="text-lg md:text-xl text-walnut max-w-2xl mx-auto font-light leading-relaxed">
             Submit your burning questions for the revenue management workshop
